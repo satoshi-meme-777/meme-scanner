@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MemeScan – Best Micro-Cap Meme Coins (&lt;$5k MC)</title>
+  <meta name="description" content="Open-source scanner for the best meme coins under $5,000 market cap. Free, no API key needed." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            meme: { 50: '#fdf4ff', 100: '#fae8ff', 200: '#f5d0fe', 300: '#f0abfc', 400: '#e879f9', 500: '#d946ef', 600: '#c026d3', 700: '#a21caf', 800: '#86198f', 900: '#701a75' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background: radial-gradient(ellipse at top, #1a0b2e 0%, #0f0a1a 50%, #05030a 100%); }
+    .card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(217, 70, 239, 0.15); }
+    .score-badge { background: linear-gradient(135deg, #d946ef, #a21caf); }
+    .pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+  </style>
+</head>
+<body class="text-white min-h-screen font-sans">
+  <!-- Header -->
+  <header class="border-b border-meme-800/50 bg-black/40 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-meme-500 to-purple-700 flex items-center justify-center text-xl font-black">M</div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">MemeScan</h1>
+          <p class="text-xs text-meme-300">Micro-cap gems under $5k MC</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <button id="refreshBtn" class="px-4 py-2 rounded-lg bg-meme-600 hover:bg-meme-500 transition font-medium flex items-center gap-2">
+          <svg id="refreshIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Scan Now
+        </button>
+        <a href="https://github.com/" target="_blank" class="text-meme-300 hover:text-white text-xs underline">Open Source</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Donation Banner -->
+    <div class="mb-6 p-4 rounded-2xl bg-gradient-to-r from-meme-900/80 to-purple-900/60 border border-meme-700/50">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-medium text-meme-200">💚 Support the project (Solana)</p>
+          <p class="text-xs text-meme-400 mt-0.5">Donations keep the scanner free & open source</p>
+        </div>
+        <div class="flex items-center gap-2 bg-black/40 rounded-xl px-3 py-2 font-mono text-sm break-all">
+          <span id="donationAddr">6SS8S2TppvDM85sb46yhfS7XCNq1UWwwKwjoWpSs58xn</span>
+          <button onclick="copyDonation()" class="shrink-0 px-2 py-1 rounded bg-meme-700 hover:bg-meme-600 text-xs">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters & Status -->
+    <div class="flex flex-wrap items-center gap-4 mb-5 text-sm">
+      <div class="flex items-center gap-2">
+        <label class="text-meme-300">Min Liquidity $</label>
+        <input id="minLiq" type="number" value="200" min="0" class="w-24 bg-black/50 border border-meme-800 rounded-lg px-2 py-1.5 text-white" />
+      </div>
+      <div class="flex items-center gap-2">
+        <label class="text-meme-300">Chain</label>
+        <select id="chainSelect" class="bg-black/50 border border-meme-800 rounded-lg px-2 py-1.5 text-white">
+          <option value="solana">Solana</option>
+          <option value="all">All Chains</option>
+        </select>
+      </div>
+      <div id="status" class="text-meme-400 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-yellow-400 pulse"></span>
+        Ready to scan…
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Cards injected here -->
+    </div>
+
+    <div id="empty" class="hidden text-center py-16 text-meme-400">
+      <p class="text-lg">No micro-cap memes found right now.</p>
+      <p class="text-sm mt-2">Try lowering min liquidity or hit Scan again in a minute.</p>
+    </div>
+
+    <div id="loading" class="hidden text-center py-16">
+      <div class="inline-block w-10 h-10 border-4 border-meme-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="mt-4 text-meme-300">Scanning latest pairs & profiles…</p>
+    </div>
+  </main>
+
+  <footer class="border-t border-meme-900/50 mt-12 py-6 text-center text-xs text-meme-500">
+    <p>Open source • Data from <a href="https://dexscreener.com" target="_blank" class="underline">DexScreener</a> free API • Not financial advice • DYOR</p>
+    <p class="mt-1">MIT License • Built for the degen community</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
